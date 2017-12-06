@@ -27,3 +27,87 @@ read.me 中有 编译介绍 。
 pip install python-snappy （下载 whl 文件）
 pip install pyzmq
 pip install jaqs
+
+https://www.quantos.org/tradesim/doc.html
+
+#用户可使用令牌登录访问在线数据系统
+from jaqs.data import DataApi
+api = DataApi(addr="tcp://data.tushare.org:8910") 
+api.login("手机号", "token")  
+from tradeapi import TradeApi    
+
+
+
+
+
+
+
+
+    
+ #开始使用DataApi
+from jaqs.data import DataApi
+api = DataApi(addr="tcp://data.tushare.org:8910") 
+user_info, msg = api.login("13261680938", "eyJhbGciOiJIUzI1NiJ9.eyJjcmVhdGVfdGltZSI6IjE1MTI1NDAxODY2MzkiLCJpc3MiOiJhdXRoMCIsImlkIjoiMTMyNjE2ODA5MzgifQ.jhIIeZzO38ejK9GbHGXPyliFRCGLgMPhhUgby2XjPVY")     
+print (user_info)
+print (msg    )
+
+symbol = 'T1712.CFE, TF1712.CFE, rb1712.SHF'
+fields = 'open,high,low,last,volume'
+
+# 获取实时行情
+df, msg = api.quote(symbol=symbol, fields=fields)
+print(df)
+print(msg)    
+
+
+df, msg = api.daily(
+                symbol="600832.SH, 600030.SH", 
+                start_date="2012-10-26",
+                end_date="2012-11-30", 
+                fields="", 
+                adjust_mode="post")
+
+
+
+
+
+
+
+#用户可使用令牌登录访问仿真交易系统
+import TradeApi
+from jaqs.trade.tradeapi import TradeApi
+tapi = TradeApi(addr="tcp://gw.quantos.org:8901") 
+user_info, msg = tapi.login("13261680938", "eyJhbGciOiJIUzI1NiJ9.eyJjcmVhdGVfdGltZSI6IjE1MTI1NDAxODY2MzkiLCJpc3MiOiJhdXRoMCIsImlkIjoiMTMyNjE2ODA5MzgifQ.jhIIeZzO38ejK9GbHGXPyliFRCGLgMPhhUgby2XjPVY")    
+# 选择策略号
+tapi.use_strategy(637) # 123为给你分配的策略号，可以从user_info中获得
+
+# 下单接口
+task_id, msg = tapi.place_order("000025.SZ", "Buy", 57, 100)
+print ("msg:", msg)
+print ("task_id:", task_id )   
+    
+sid, msg = tapi.use_strategy(1)
+print ("msg:", msg)
+print ("sid:", sid )   
+    
+#查询Portfolio
+#返回当前的策略帐号的Universe中所有标的的净持仓，包括持仓为0的标的。
+#查询Portfolio
+df, msg = tapi.query_account()
+print ("msg: ", msg)
+print (df      )
+
+#查询当前策略帐号的所有持仓
+df, msg = tapi.query_position()
+print ("msg: ", msg)
+print (df)
+
+
+#单标的下单
+task_id, msg = tapi.place_order("000025.SZ", "Buy", 57, 100)
+
+
+#查询成交
+#返回成交信息
+df, msg = tapi.query_trade(task_id = task_id, format = 'pandas')
+print(df, msg)
