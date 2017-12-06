@@ -111,3 +111,34 @@ task_id, msg = tapi.place_order("000025.SZ", "Buy", 57, 100)
 #返回成交信息
 df, msg = tapi.query_trade(task_id = task_id, format = 'pandas')
 print(df, msg)
+
+
+#------------
+#创建DataView和DataService
+#DataService提供原始的数据，目前jaqs已经提供远程数据服务类（RemoteDataService），可以通过互联网获取行情数据和参考数据。
+from jaqs.data.dataservice import RemoteDataService
+from jaqs.data.dataview import DataView
+dv = DataView()
+ds = RemoteDataService()
+
+
+#示例代码：
+#dv = DataView()
+#ds = RemoteDataService()
+
+secs = '600030.SH,000063.SZ,000001.SZ'
+props = {'start_date': 20160601, 'end_date': 20170601, 'symbol': secs,
+       'fields': 'open,close,high,low,volume,pb,net_assets,eps_basic',
+       'freq': 1}
+dv.init_from_config(props, data_api=ds)
+
+#数据准备
+#从数据服务获取数据：
+dv.prepare_data()
+
+
+snap1 = dv.get_snapshot(20170504, symbol='600030.SH,000063.SZ', fields='close,pb')
+
+ds = RemoteDataService()
+dv.add_field('total_share', ds)
+
