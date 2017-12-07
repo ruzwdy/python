@@ -1,18 +1,8 @@
 # encoding: UTF-8
 
 """
-感谢Darwin Quant贡献的策略思路。
+感谢######贡献的策略思路。
 知乎专栏原文：https://zhuanlan.zhihu.com/p/24448511
-
-策略逻辑：
-1. 布林通道（信号）
-2. CCI指标（过滤）
-3. ATR指标（止损）
-
-适合品种：螺纹钢
-适合周期：15分钟
-
-这里的策略是作者根据原文结合vn.py实现，对策略实现上做了一些修改，仅供参考。
 
 """
 
@@ -128,7 +118,7 @@ class HuaXianStrategy(CtaTemplate):
         """Constructor"""
         super(HuaXianStrategy, self).__init__(ctaEngine, setting)
         
-        self.bm = BarManager(self.onBar,345, self.onXminBar)        # 创建K线合成器对象 ，一天345分钟
+        self.bm = BarManager(self.onBar,1, self.onXminBar)        # 创建K线合成器对象 ，一天543分钟
         self.am = ArrayManager()
         
     #----------------------------------------------------------------------
