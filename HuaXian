@@ -32,11 +32,16 @@ class HuaXianStrategy(CtaTemplate):
     author = '用Python的交易员'
 
     # 策略参数
+    
+    L_n= 10#多头固定止损
+    S_n= 10#空头固定止损
+    entryprice = 0
     lastbar0 = 3900
     lastbar = 0
     barlist = []
     gp = 33
     gd = -32
+    md = (33 +32)/2
 
     bollWindow = 18                     # 布林通道窗口数
     bollDev = 3.4                       # 布林通道的偏差
@@ -152,20 +157,24 @@ class HuaXianStrategy(CtaTemplate):
         self.bollUp = self.lastbar.close + self.gp
         self.bollDown = self.lastbar.close + self.gd 
 
-        print (self.lastbar.datetime.date(),self.bollUp,self.bollDown,'OK')
+#        print (self.lastbar.datetime.date(),self.bollUp,self.bollDown,'OK')
         # 判断是否要进行交易
-    
+        """ 先判断 bar.close 的位置 
+        划分为四个 区域  close 所处的 区间 （没有 考虑其所处的历史形态（60n））
+        """
         # 当前无仓位，发送开仓委托
         if self.pos == 0:
             self.intraTradeHigh = bar.high
             self.intraTradeLow = bar.low            
             
             if bar.close > self.bollUp:
-                self.buy(bar.close, self.fixedSize, True)
+                self.entryprice =bar.close
+                self.buy(self.entryprice, self.fixedSize, True)
+                
                 
             if bar.close < self.bollDown:
+                self.entryprice =bar.close
                 self.short(bar.close, self.fixedSize, True)
-    
         # 持有多头仓位
         elif self.pos > 0:
             self.intraTradeHigh = max(self.intraTradeHigh, bar.high)
@@ -173,6 +182,10 @@ class HuaXianStrategy(CtaTemplate):
             self.longStop = self.intraTradeLow  #- self.atrValue * self.slMultiplier
             
             self.sell(self.longStop, abs(self.pos), True)
+            
+            #固定 点位距离 止损
+            self.sell(self.entryprice - self.L_n, abs(self.pos), True)
+            
     
         # 持有空头仓位
         elif self.pos < 0:
@@ -181,6 +194,8 @@ class HuaXianStrategy(CtaTemplate):
             self.shortStop = self.intraTradeHigh # + self.atrValue * self.slMultiplier
             
             self.cover(self.shortStop, abs(self.pos), True)
+            #固定 点位距离 止损
+            self.cover(self.entryprice + self.S_n, abs(self.pos), True)
     
         # 发出状态更新事件
         self.putEvent()        
