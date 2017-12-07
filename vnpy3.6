@@ -30,6 +30,8 @@ pip install jaqs
 
 https://www.quantos.org/tradesim/doc.html
 
+   
+#
 #用户可使用令牌登录访问在线数据系统
 from jaqs.data import DataApi
 api = DataApi(addr="tcp://data.tushare.org:8910") 
@@ -41,33 +43,35 @@ from tradeapi import TradeApi
 
 
 
-
-
     
  #开始使用DataApi
 from jaqs.data import DataApi
+tel = '13261680938'
+tkn = 'eyJhbGciOiJIUzI1NiJ9.eyJjcmVhdGVfdGltZSI6IjE1MTI1NDAxODY2MzkiLCJpc3MiOiJhdXRoMCIsImlkIjoiMTMyNjE2ODA5MzgifQ.jhIIeZzO38ejK9GbHGXPyliFRCGLgMPhhUgby2XjPVY'
+
 api = DataApi(addr="tcp://data.tushare.org:8910") 
-user_info, msg = api.login("13261680938", "eyJhbGciOiJIUzI1NiJ9.eyJjcmVhdGVfdGltZSI6IjE1MTI1NDAxODY2MzkiLCJpc3MiOiJhdXRoMCIsImlkIjoiMTMyNjE2ODA5MzgifQ.jhIIeZzO38ejK9GbHGXPyliFRCGLgMPhhUgby2XjPVY")     
+user_info, msg = api.login(tel, tkn)     
 print (user_info)
 print (msg    )
 
-symbol = 'T1712.CFE, TF1712.CFE, rb1712.SHF'
-fields = 'open,high,low,last,volume'
+symbol0 = 'T1712.CFE, TF1712.CFE, rb1712.SHF'
+fields0 = 'open,high,low,last,volume'
 
 # 获取实时行情
-df, msg = api.quote(symbol=symbol, fields=fields)
+df, msg = api.quote(symbol=symbol0, fields=fields0)
 print(df)
 print(msg)    
 
 
 df, msg = api.daily(
-                symbol="600832.SH, 600030.SH", 
-                start_date="2012-10-26",
-                end_date="2012-11-30", 
-                fields="", 
+                symbol=symbol0 ,#"600832.SH, 600030.SH", 
+                start_date="2017-11-26",
+                end_date="2017-12-07", 
+                fields=fields0 , 
                 adjust_mode="post")
 
 
+print(df),print(msg)    
 
 
 
@@ -123,26 +127,32 @@ dv = DataView()
 ds = RemoteDataService()
 
 
-#示例代码：
-#dv = DataView()
-#ds = RemoteDataService()
-
 secs = '600030.SH,000063.SZ,000001.SZ'
 props = {'start_date': 20160601, 'end_date': 20170601, 'symbol': secs,
        'fields': 'open,close,high,low,volume,pb,net_assets,eps_basic',
        'freq': 1}
 dv.init_from_config(props, data_api=ds)
 
-#数据准备
-#从数据服务获取数据：
+#数据准备   从数据服务获取数据：
 dv.prepare_data()
 
-
+#返回在结果格式为pandas DataFrame，标的代码作为DataFrame的index，数据字段作为DataFrame的column。2
 snap1 = dv.get_snapshot(20170504, symbol='600030.SH,000063.SZ', fields='close,pb')
+snap1.head() 
 
 ds = RemoteDataService()
 dv.add_field('total_share', ds)
 
+
+ts1 = dv.get_ts('close', symbol='600030.SH,000063.SZ', 
+            start_date=20170101, end_date=20170302)
+
+ts1.head()
+
+dv.save_dataview('E:\\python')
+dv = DataView()
+y = dv.load_dataview('E:\\python')
+y
 
 
 ############################## 示例
@@ -280,7 +290,6 @@ if __name__ == "__main__":
 
     t3 = time.time() - t_start
     print("\n\n\nTime lapsed in total: {:.1f}".format(t3))
-
 
 #################################
 
