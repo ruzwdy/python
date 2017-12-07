@@ -88,7 +88,7 @@ class HuaXianStrategy(CtaTemplate):
         """Constructor"""
         super(HuaXianStrategy, self).__init__(ctaEngine, setting)
         
-        self.bm = BarManager(self.onBar, 60, self.onXminBar)        # 创建K线合成器对象
+        self.bm = BarManager(self.onBar,345, self.onXminBar)        # 创建K线合成器对象 ，一天345分钟
         self.am = ArrayManager()
         
     #----------------------------------------------------------------------
@@ -160,17 +160,17 @@ class HuaXianStrategy(CtaTemplate):
             self.intraTradeHigh = bar.high
             self.intraTradeLow = bar.low            
             
-            if bar.close > self.bollDown:
+            if bar.close > self.bollUp:
                 self.buy(bar.close, self.fixedSize, True)
                 
-            if bar.close < self.bollUp:
+            if bar.close < self.bollDown:
                 self.short(bar.close, self.fixedSize, True)
     
         # 持有多头仓位
         elif self.pos > 0:
             self.intraTradeHigh = max(self.intraTradeHigh, bar.high)
             self.intraTradeLow = bar.low
-            self.longStop = self.intraTradeLow  - self.atrValue * self.slMultiplier
+            self.longStop = self.intraTradeLow  #- self.atrValue * self.slMultiplier
             
             self.sell(self.longStop, abs(self.pos), True)
     
@@ -178,7 +178,7 @@ class HuaXianStrategy(CtaTemplate):
         elif self.pos < 0:
             self.intraTradeHigh = bar.high
             self.intraTradeLow = min(self.intraTradeLow, bar.low)
-            self.shortStop = self.intraTradeHigh + self.atrValue * self.slMultiplier
+            self.shortStop = self.intraTradeHigh # + self.atrValue * self.slMultiplier
             
             self.cover(self.shortStop, abs(self.pos), True)
     
@@ -200,5 +200,3 @@ class HuaXianStrategy(CtaTemplate):
         """停止单推送"""
         pass
     
-
-
