@@ -2,14 +2,20 @@
 #https://github.com/vvipi/py3_demo_on_vnpy_ctp # 网友贡献 3 的ctp 接口
 注释掉 非CTP 接口 
 论坛下载 3.6编译后的 dll .
-read.me 中有 编译介绍 。
+        正题
+        我的环境是64位win7  Anaconda5(py3.61-64)
+        1 在vnpy的github主页上下载zip包，解压在一个目录下，假设在c盘根下，然后用2to3转换里面的py文件，网上有按目录批量转的，可以度一下。这步必须做，初步解决2到3的兼容性问题，主要是print方面的修改。
+        2 按照https://github.com/vnpy/vnpy/wik ... 3%E5%AE%89%E8%A3%85 的步骤 先装mongodb，注册服务，再运行vn目录下的install.BAT,之后在Anaconda下会安装vn的核心包，目录 d:\Anaconda3\Lib\site-packages\vnpy-1.7.1-py3.6.egg\ 以下对这个路径简称为包
+        3 http://www.vnpie.com/forum.php?m ... id=1891&highlight=3 板哥帖子的5楼，下载封装好的ctp接口，里面4个文件，用来替换d:\Anaconda3\Lib\site-packages\vnpy-1.7.1-py3.6.egg\vnpy\api\ctp\下同名的文件，这步很重要，(再次感谢板哥)
+        4 对file(self.filePath)语句的修改，file是2.7的用法，3已经用open()替换了，所以必须对这个处理，在包里面大概有16个文件涉及这，把该语句替换成open(self.filePath,'r', encoding="utf-8")
+        read.me 中有 编译介绍 。
 
-    "E:\MongoDB\Server\3.4\bin\mongod.exe" --config "E:\MongoDB\Server\3.4\mongod.cfg" --install
+"E:\MongoDB\Server\3.4\bin\mongod.exe" --config "E:\MongoDB\Server\3.4\mongod.cfg" --install
 
-    E:
-    cd E:\MongoDB\Server\3.4\bin
-    mon
-    
+E:
+cd E:\MongoDB\Server\3.4\bin
+mon
+
     
 #数据导入
     由于2 与3 之间的区别 
