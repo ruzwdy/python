@@ -1,0 +1,294 @@
+#准备工作
+#https://github.com/vvipi/py3_demo_on_vnpy_ctp # 网友贡献 3 的ctp 接口
+注释掉 非CTP 接口 
+论坛下载 3.6编译后的 dll .
+read.me 中有 编译介绍 。
+
+    "E:\MongoDB\Server\3.4\bin\mongod.exe" --config "E:\MongoDB\Server\3.4\mongod.cfg" --install
+
+    E:
+    cd E:\MongoDB\Server\3.4\bin
+    mon
+    
+    
+#数据导入
+    由于2 与3 之间的区别 
+    file函数要替换为 open 
+    print 需要加括号
+# 策略编写
+策略在 sitpackge 里 配置 和 填写
+要在 sitpackge 目录下的  CTA_setting.json 文件中 添加策略名称 和 合约
+策略名称 和 文件名 字母数要一直
+# 价差交易 
+合约所在目录 文件 app\spreadTrading  ST_setting.json 
+
+#安装JAQS  对接vnpy   https://www.quantos.org/
+
+pip install python-snappy （下载 whl 文件）
+pip install pyzmq
+pip install jaqs
+
+https://www.quantos.org/tradesim/doc.html
+
+   
+#
+#用户可使用令牌登录访问在线数据系统
+from jaqs.data import DataApi
+api = DataApi(addr="tcp://data.tushare.org:8910") 
+api.login("手机号", "token")  
+from tradeapi import TradeApi    
+
+
+
+
+
+
+    
+ #开始使用DataApi
+from jaqs.data import DataApi
+tel = '13261680938'
+tkn = 'eyJhbGciOiJIUzI1NiJ9.eyJjcmVhdGVfdGltZSI6IjE1MTI1NDAxODY2MzkiLCJpc3MiOiJhdXRoMCIsImlkIjoiMTMyNjE2ODA5MzgifQ.jhIIeZzO38ejK9GbHGXPyliFRCGLgMPhhUgby2XjPVY'
+
+api = DataApi(addr="tcp://data.tushare.org:8910") 
+user_info, msg = api.login(tel, tkn)     
+print (user_info)
+print (msg    )
+
+symbol0 = 'T1712.CFE, TF1712.CFE, rb1712.SHF'
+fields0 = 'open,high,low,last,volume'
+
+# 获取实时行情
+df, msg = api.quote(symbol=symbol0, fields=fields0)
+print(df)
+print(msg)    
+
+
+df, msg = api.daily(
+                symbol=symbol0 ,#"600832.SH, 600030.SH", 
+                start_date="2017-11-26",
+                end_date="2017-12-07", 
+                fields=fields0 , 
+                adjust_mode="post")
+
+
+print(df),print(msg)    
+
+
+
+
+
+#用户可使用令牌登录访问仿真交易系统
+#import TradeApi
+from jaqs.trade.tradeapi import TradeApi
+tapi = TradeApi(addr="tcp://gw.quantos.org:8901") 
+tel = '1********8'
+tkn = 'eyJhbGciOiJjK9GbHGXPyliFRCGLgMPhhUgby2XjPVY'
+
+user_info, msg = tapi.login(tel, tkn)    
+# 选择策略号
+tapi.use_strategy(637) # 123为给你分配的策略号，可以从user_info中获得
+
+# 下单接口
+task_id, msg = tapi.place_order("000025.SZ", "Buy", 57, 100)
+print ("msg:", msg), print ("task_id:", task_id )   
+    
+sid, msg = tapi.use_strategy(1)
+print ("msg:", msg), print ("sid:", sid )   
+    
+#查询Portfolio
+#返回当前的策略帐号的Universe中所有标的的净持仓，包括持仓为0的标的。
+#查询Portfolio
+df, msg = tapi.query_account()
+print ("msg: ", msg),print (df      )
+
+
+#查询当前策略帐号的所有持仓
+df, msg = tapi.query_position()
+print ("msg: ", msg), print (df)
+
+
+#单标的下单
+task_id, msg = tapi.place_order("000025.SZ", "Buy", 57, 100)
+
+
+#查询成交
+#返回成交信息
+df, msg = tapi.query_trade(task_id = task_id, format = 'pandas')
+print(df, msg)
+
+
+#------------------------------------------------------------------
+#DataView初始化工作主要包括创建DataView和DataService、初始化配置、数据准备三步。
+#创建DataView和DataService 
+#DataService提供原始的数据，目前jaqs已经提供远程数据服务类（RemoteDataService），可以通过互联网获取行情数据和参考数据。
+from jaqs.data.dataservice import RemoteDataService
+from jaqs.data.dataview import DataView
+dv = DataView()
+ds = RemoteDataService()
+
+
+secs = '600030.SH,000063.SZ,000001.SZ'
+props = {'start_date': 20160601, 'end_date': 20170601, 'symbol': secs,
+       'fields': 'open,close,high,low,volume,pb,net_assets,eps_basic',
+       'freq': 1}
+dv.init_from_config(props, data_api=ds)
+
+#数据准备   从数据服务获取数据：
+dv.prepare_data()
+
+#返回在结果格式为pandas DataFrame，标的代码作为DataFrame的index，数据字段作为DataFrame的column。2
+snap1 = dv.get_snapshot(20170504, symbol='600030.SH,000063.SZ', fields='close,pb')
+snap1.head() 
+
+ds = RemoteDataService()
+dv.add_field('total_share', ds)
+
+
+ts1 = dv.get_ts('close', symbol='600030.SH,000063.SZ', 
+            start_date=20170101, end_date=20170302)
+
+ts1.head()
+
+dv.save_dataview('E:\\python')
+dv = DataView()
+y = dv.load_dataview('E:\\python')
+y
+
+
+############################## 示例
+# -*- encoding: utf-8 -*-
+"""
+Both backtest and live trading are included.
+"""
+
+from __future__ import print_function
+from __future__ import absolute_import
+import time
+
+from jaqs.data import RemoteDataService
+from jaqs.trade import AlphaBacktestInstance, AlphaLiveTradeInstance
+
+import jaqs.util as jutil
+from jaqs.trade import PortfolioManager
+import jaqs.trade.analyze as ana
+from jaqs.trade import AlphaStrategy
+from jaqs.trade import AlphaTradeApi, RealTimeTradeApi
+from jaqs.trade import model
+from jaqs.data import DataView
+
+#from config_path import DATA_CONFIG_PATH, TRADE_CONFIG_PATH
+#data_config = jutil.read_json(DATA_CONFIG_PATH)
+data_config= {
+  "remote.data.address": "tcp://data.tushare.org:8910",
+  "remote.data.username": tel,
+  "remote.data.password": tkn
+}
+
+#trade_config = jutil.read_json(TRADE_CONFIG_PATH)
+trade_config = {
+  "remote.trade.address": "tcp://gw.quantos.org:8901",
+  "remote.trade.username": tel,
+  "remote.trade.password": tkn
+}
+
+dataview_dir_path = u'E:\\python\\HuiCe\\dataview'
+backtest_result_dir_path = u'E:\\python\\HuiCe'
+
+BENCHMARK = '399997.SZ'
+is_backtest = True
+
+def test_save_dataview():
+    ds = RemoteDataService()
+    ds.init_from_config(data_config)
+    dv = DataView()
+
+    props = {'start_date': 20170901, 'end_date': 20171129, 'universe': BENCHMARK,
+             'fields': 'close,volume,sw1',
+             'freq': 1}
+
+    dv.init_from_config(props, ds)
+    dv.prepare_data()
+
+    dv.add_formula('ret', 'Return(close_adj, 20)', is_quarterly=False)
+    dv.add_formula('rank_ret', 'Rank(ret)', is_quarterly=False)
+
+    dv.save_dataview(folder_path=dataview_dir_path)
+
+
+def my_selector(context, user_options=None):
+    rank_ret = context.snapshot['rank_ret']
+
+    return rank_ret >= 0.9
+
+
+def test_alpha_strategy_dataview():
+    dv = DataView()
+    dv.load_dataview(folder_path=dataview_dir_path)
+
+    props = {
+        "benchmark": BENCHMARK,
+        "universe": ','.join(dv.symbol),
+
+        "start_date": dv.start_date,
+        "end_date": dv.end_date,
+
+        "period": "day",
+        "days_delay": 0,
+
+        "init_balance": 1e8,
+        "position_ratio": 1.0,
+        "strategy_no": 44
+    }
+    props.update(data_config)
+    props.update(trade_config)
+
+    stock_selector = model.StockSelector()
+    stock_selector.add_filter(name='rank_ret_top10', func=my_selector)
+
+    strategy = AlphaStrategy(stock_selector=stock_selector, pc_method='equal_weight')
+    pm = PortfolioManager()
+
+    if is_backtest:
+        bt = AlphaBacktestInstance()
+        trade_api = AlphaTradeApi()
+        ds = None
+    else:
+        bt = AlphaLiveTradeInstance()
+        trade_api = RealTimeTradeApi(props)
+        ds = RemoteDataService()
+    
+    context = model.Context(dataview=dv, instance=bt, strategy=strategy, trade_api=trade_api, pm=pm, data_api=ds)
+    stock_selector.register_context(context)
+    
+    bt.init_from_config(props)
+    bt.run_alpha()
+    
+    if is_backtest:
+        bt.save_results(folder_path=backtest_result_dir_path)
+    else:
+        goal_positions = strategy.goal_positions
+        print(goal_positions)
+    
+
+def test_backtest_analyze():
+    ta = ana.AlphaAnalyzer()
+    dv = DataView()
+    dv.load_dataview(folder_path=dataview_dir_path)
+
+    ta.initialize(dataview=dv, file_folder=backtest_result_dir_path)
+    
+    ta.do_analyze(result_dir=backtest_result_dir_path, selected_sec=list(ta.universe)[:3], brinson_group='sw1')
+
+
+if __name__ == "__main__":
+    t_start = time.time()
+
+    test_save_dataview()
+    test_alpha_strategy_dataview()
+    if is_backtest:
+        test_backtest_analyze()
+
+    t3 = time.time() - t_start
+    print("\n\n\nTime lapsed in total: {:.1f}".format(t3))
+
+#################################
