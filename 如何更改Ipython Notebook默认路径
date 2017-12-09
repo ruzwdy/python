@@ -1,0 +1,12 @@
+当我们安装完ipython notebook后，默认路径是在user里，我们无法切换到其他磁盘，下面介绍两个方法。
+一、
+1.把ipython notebook 的快捷方式复制到你工作目录里
+2.右键属性，删除“起始位置”中的内容，并确定
+当我们再打开IPython notebook时，显示的路径就是当前保存的路径
+二、
+1. 打开命令行, 键入ipython profile create
+2. 根据这个地址, 打开profile所在的文件夹
+3. 打开文件: ipython_notebook_config.py
+4. 修改代码，注意去掉前面的#(#是注释的意思)
+4.1 对于Python2,，c.NotebookApp.notebook_dir = '你的路径，例如（E:\Ipython Notebook）'
+4.2 对于Python3， c.FileNotebookManager.notebook_dir ='你的路径'<pre name="code"  class="python">c.NotebookManager.notebook_dir = '你的路径'
