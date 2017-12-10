@@ -10,3 +10,12 @@
 4. 修改代码，注意去掉前面的#(#是注释的意思)
 4.1 对于Python2,，c.NotebookApp.notebook_dir = '你的路径，例如（E:\Ipython Notebook）'
 4.2 对于Python3， c.FileNotebookManager.notebook_dir ='你的路径'<pre name="code"  class="python">c.NotebookManager.notebook_dir = '你的路径'
+
+#########
+    f:
+    cd F:\Python\jupyter-notebook
+    ipython notebook
+#############    
+    
+    
+    
