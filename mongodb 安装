@@ -1,0 +1,9 @@
+#
+e:
+cd E:\MongoDB\bin
+mongod --dbpath E:\mongodb\data\db
+
+#
+sublim 安装
+
+
