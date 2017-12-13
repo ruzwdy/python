@@ -5,5 +5,7 @@ mongod --dbpath E:\mongodb\data\db
 
 #
 sublim 安装
+#
+talib 安装 whl 下载网站 https://www.lfd.uci.edu/~gohlke/pythonlibs/
 
 
