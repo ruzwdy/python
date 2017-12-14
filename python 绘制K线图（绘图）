@@ -23,3 +23,7 @@ plt.xlabel("时间")
 plt.ylabel("股价（元）")
 mpf.candlestick_ohlc(ax,data_list,width=1.5,colorup='r',colordown='green')
 plt.grid()
+
+# lengend 图例绘图
+
+http://matplotlib.org/tutorials/intermediate/legend_guide.html#sphx-glr-tutorials-intermediate-legend-guide-py
