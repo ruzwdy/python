@@ -26,7 +26,7 @@ plt.grid()
 
 # lengend 图例绘图
 
-http://matplotlib.org/tutorials/intermediate/legend_guide.html#sphx-glr-tutorials-intermediate-legend-guide-py
+http://matplotlib.org/tutorials/intermediate/legend_guide.html  #sphx-glr-tutorials-intermediate-legend-guide-py
 
 http://www.th7.cn/Program/Python/201708/1229043.shtml
 #
