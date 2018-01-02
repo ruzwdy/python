@@ -12,6 +12,26 @@
                       统计运算	.cut() .qcut() .idxmin() .idxmax() .value_counts() .sum()…
                       排序	.sort_index() .sort_values() .nsmallest() .nlargest()
                       其他	.dt Iteration .copy() .info()
+                      
+                     count   非 NA 值的数量
+                    describe    针对 Series 或 DF 的列计算汇总统计
+                    min , max   最小值和最大值
+                    argmin , argmax 最小值和最大值的索引位置（整数）
+                    idxmin , idxmax 最小值和最大值的索引值
+                    quantile    样本分位数（0 到 1）
+                    sum 求和
+                    mean    均值
+                    median  中位数
+                    mad 根据均值计算平均绝对离差
+                    var 方差
+                    std 标准差
+                    skew    样本值的偏度（三阶矩）
+                    kurt    样本值的峰度（四阶矩）
+                    cumsum  样本值的累计和
+                    cummin , cummax 样本值的累计最大值和累计最小值
+                    cumprod 样本值的累计积
+                    diff    计算一阶差分（对时间序列很有用）
+                    pct_change  计算百分数变化
   机器学习
   hurst 指数
   马尔科夫
